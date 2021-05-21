@@ -13,7 +13,9 @@ void on_receive_lora_callback(int packet_size) {
   uint8_t buffer[sizeof(weight)];
   uint64_t time = 0;
   uint8_t bufferTime[sizeof(time)];
-
+  float altitude = 0;
+  uint8_t buffer_altitude[sizeof(altitude)];
+  bool recovery = false;
 
   destination = LoRa.read();
   if (destination == 0xFF) {
@@ -34,6 +36,19 @@ void on_receive_lora_callback(int packet_size) {
       // Serial.print("\t");
       Serial.println();
       // Serial.println(LoRa.packetRssi(), DEC);
+    } else if (local_address == 0xF3) {
+      LoRa.readBytes(buffer_altitude, sizeof(altitude));
+      altitude = *((float*)buffer_altitude);
+      LoRa.readBytes(bufferTime, sizeof(time));
+      time = *((uint64_t*)bufferTime);
+      recovery = LoRa.read();
+
+      Serial.print(time);
+      Serial.print("\t");
+      Serial.print(altitude);
+      Serial.print("\t");
+      Serial.print(recovery);
+      Serial.print("\n");
     }
   } else {
     payload = LoRa.readString();
