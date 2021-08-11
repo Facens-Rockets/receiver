@@ -1,6 +1,7 @@
 #ifndef INCLUDE_LORA_CALLBACK_H__
 #define INCLUDE_LORA_CALLBACK_H__
 
+#include "heltec.h"
 #include "setup_tasks.hpp"
 
 byte destination = 0;
@@ -16,6 +17,10 @@ void on_receive_lora_callback(int packet_size) {
   float altitude = 0;
   uint8_t buffer_altitude[sizeof(altitude)];
   bool recovery = false;
+  float latitude = 0;
+  uint8_t buffer_latitude[sizeof(latitude)];
+  float longitude = 0;
+  uint8_t buffer_longitude[sizeof(longitude)];
 
   destination = LoRa.read();
   if (destination == 0xFF) {
@@ -30,7 +35,7 @@ void on_receive_lora_callback(int packet_size) {
       // Serial.print("\t");
       // Serial.print(local_address, HEX);
       // Serial.print("\t");
-      Serial.print(weight * -1);
+      Serial.print(weight);
       Serial.print("\t");
       Serial.print(time);
       // Serial.print("\t");
@@ -42,13 +47,25 @@ void on_receive_lora_callback(int packet_size) {
       LoRa.readBytes(bufferTime, sizeof(time));
       time = *((uint64_t*)bufferTime);
       recovery = LoRa.read();
+      // LoRa.readBytes(buffer_latitude, sizeof(latitude));
+      // latitude = *((float*)buffer_latitude);
+      // LoRa.readBytes(buffer_longitude, sizeof(longitude));
+      // longitude = *((float*)buffer_longitude);
+
+      // xQueueSend(plot_oled_queue_altitude, &altitude, portMAX_DELAY);
+      // xQueueSend(plot_oled_queue_time, &time, portMAX_DELAY);
+      // xQueueSend(plot_oled_queue_recovery, &recovery, portMAX_DELAY);
 
       Serial.print(time);
-      Serial.print("\t");
+      Serial.print(";");  
       Serial.print(altitude);
-      Serial.print("\t");
+      Serial.print(";");
+      Serial.print(0);
+      Serial.print(";");
+      Serial.print(0);
       Serial.print(recovery);
       Serial.print("\n");
+      //Serial.println(LoRa.packetRssi());
     }
   } else {
     payload = LoRa.readString();

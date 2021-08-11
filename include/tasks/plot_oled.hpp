@@ -1,35 +1,25 @@
 #ifndef INCLUDE_TASKS_PLOT_OLED_H__
 #define INCLUDE_TASKS_PLOT_OLED_H__
-
-#include "heltec.h"
 #include "setup_tasks.hpp"
 
 void plot_oled_code(void* parameters) {
-  uint8_t init_receive = 0;
-  int packet_rssi = 0;
-
-  // char* load = "";
-
-  byte relay_response = 0x00;
-
+  float altitude = 0.00;
+  uint64_t time = 0;
+  bool recovery = false;
+  
   while (true) {
-    xQueueReceive(ignition_queue, &ignition_send, 1);
-    // xQueueReceive(load_queue, &load, 1);
-    xQueueReceive(relay_response_queue, &relay_response, 1);
-    xQueueReceive(packet_rssi_queue, &packet_rssi, 1);
-
+    xQueueReceive(plot_oled_queue_altitude, &altitude, portMAX_DELAY);
+    xQueueReceive(plot_oled_queue_time, &time, portMAX_DELAY);
+    xQueueReceive(plot_oled_queue_recovery, &recovery, portMAX_DELAY);
     Heltec.display->clear();
 
     Heltec.display->setFont(ArialMT_Plain_10);
-    Heltec.display->drawString(0, 0, "Init: " + init_receive ? "Iniciado" : "Aguardando...");
-    Heltec.display->drawString(0, 10, "RSSI: " + String(packet_rssi, DEC));
 
-    Heltec.display->setFont(ArialMT_Plain_16);
-    // Heltec.display->drawString(0, 30, "Load: "+ message.payload);
-    Heltec.display->drawString(0, 30, "MAX: " + String(packet_rssi, DEC));
+    Heltec.display->drawString(0, 0, "Altitude:\t" + String(altitude) + " mts");
+    // Heltec.display->drawString(0, 10, "Time:\t" + time + " ms");
+    Heltec.display->drawString(0, 20, "Recovery:\t" + String(recovery));
 
     Heltec.display->display();
-
     vTaskDelay(1);
   }
 }
