@@ -6,7 +6,7 @@
 #define LORA_BAND 915E6
 
 void setup_lora() { 
-  LoRa.setSpreadingFactor(7);
+  LoRa.setSpreadingFactor(9);
   LoRa.setSignalBandwidth(500E3);
   LoRa.setCodingRate4(6);
   // LoRa.setPreambleLength(2);
